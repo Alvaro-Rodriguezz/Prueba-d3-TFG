@@ -1,0 +1,31 @@
+.node {
+    cursor: pointer;
+}
+
+.node rect {
+  stroke-width: 3px;
+}
+
+.node text {
+  font: 12px sans-serif;
+  text-anchor: start;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 3px;
+}
+
+.div-hover-in{
+  transition: 3s ease-in;
+  opacity: 1;
+  visibility: visible;
+}
+
+.div-hover-out{
+  transition: 3s ease-in;
+  opacity: 1;
+  visibility: hidden;
+}
+
