@@ -6,8 +6,7 @@ var diagonal;
 var svg;
 var drag;
 var force;
-var zoom = d3.zoom();
-        console.log({zoom});
+var zoom; 
 
 var treeData = [
     {
@@ -44,7 +43,7 @@ var treeData = [
 
 console.log({treeData});
 var margin = { top: 20, right: 120, bottom: 20, left: 120 },
-    width = document.g - margin.right - margin.left,
+    width = 5000 - margin.right - margin.left,
     height = 500 - margin.top - margin.bottom;
 console.log({margin})
 
@@ -58,16 +57,20 @@ tree = d3.layout.tree()
 diagonal = d3.svg.diagonal()
     .projection(function (d) { return [d.y, d.x]; });
 
+// zoom = d3.zoom().scaleExtent([0.1, 10]);
+// console.log({zoom});
+
 svg = d3.select("body").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    // .call(zoom);
 
+console.log({svg});
 root = treeData[0];
 root.x0 = height / 2;
 root.y0 = 0;
-
 
 
 update(root);
@@ -81,7 +84,7 @@ function update(source) {
     var nodes = tree.nodes(root);
     console.log({nodes})
     var links = tree.links(nodes);
-    console.log(links);
+    console.log({links});
     // // Normalize for fixed-depth.
     nodes.forEach(function (d) { 
         d.y = d.depth * 180; 
@@ -94,11 +97,24 @@ function update(source) {
     console.log({node});
 
     // // Enter any new nodes at the parent's previous position.
-    let div = document.createElement("div");
+    // let div = document.createElement("div");
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
         .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-        .on("click", click);
+        .on("click", click)
+        // .on("mouseover", function(d) {		
+        //     div.transition()		
+        //         .duration(200)		
+        //         .style("opacity", .9);		
+        //     div	.html("<h5>description:</h5><p> " + description[d.name] +"</p>")	
+        //         .style("left", (d3.event.pageX) + "px")		
+        //         .style("top", (d3.event.pageY - 28) + "px");	
+        //     })					
+        // .on("mouseout", function(d) {		
+        //     div.transition()		
+        //         .duration(500)		
+        //         .style("opacity", 0);	
+        // });
 
     console.log({nodeEnter});
 
@@ -144,7 +160,7 @@ function update(source) {
             console.log(a);
             a.classList.remove("div-hover-in");
             a.classList.add("div-hover-out");
-        });;
+        });
         console.log({nodeEnter});
         // let test = document.createElement("div");
         // test.style.width = "100px";
@@ -252,3 +268,7 @@ function a(d){
 function dragstart(d) {
     d.fixed = true;
   }
+
+function zoomed(){
+    svg.attr("transform", d3.event.transform)
+}  
