@@ -7,6 +7,7 @@ var svg;
 var drag;
 var force;
 var zoom; 
+var g;
 
 var treeData = [
     {
@@ -51,6 +52,25 @@ i = 0,
     duration = 750,
     root;
 
+svg = d3.select("body").append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+zoom = svg.attr('width', width)
+    .attr('height', height)
+    .append('g');
+
+g = zoom.append('g')
+.attr('transform', `translate(${margin.left},${margin.top})`);  
+
+console.log({g})
+
+svg.call(d3.zoom().on('zoom', () => {
+    g.attr('transform', d3.event.transform);
+  }));
+
 tree = d3.layout.tree()
     .size([height, width]);
 
@@ -60,12 +80,7 @@ diagonal = d3.svg.diagonal()
 // zoom = d3.zoom().scaleExtent([0.1, 10]);
 // console.log({zoom});
 
-svg = d3.select("body").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    // .call(zoom);
+
 
 console.log({svg});
 root = treeData[0];
@@ -260,15 +275,3 @@ if (d.children) {
 update(d);
 }
 
-function a(d){
-    console.log(d.data.name)
-    return 50;
-}
-
-function dragstart(d) {
-    d.fixed = true;
-  }
-
-function zoomed(){
-    svg.attr("transform", d3.event.transform)
-}  
