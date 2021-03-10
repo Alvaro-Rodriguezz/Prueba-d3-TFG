@@ -7,7 +7,7 @@ var svg;
 var drag;
 var force;
 var zoom; 
-var g;
+// var g;
 
 var treeData = [
     {
@@ -43,36 +43,32 @@ var treeData = [
 
 
 console.log({treeData});
-var margin = { top: 20, right: 120, bottom: 20, left: 120 },
-    width = 5000 - margin.right - margin.left,
-    height = 500 - margin.top - margin.bottom;
+const width = document.body.clientWidth;
+const height = document.body.clientHeight;
+const margin = { top: 0, right: 50, bottom: 0, left: 75};
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
 console.log({margin})
 
-i = 0,
-    duration = 750,
-    root;
+i = 0;
+duration = 750;
+svg = d3.select('svg');
 
-svg = d3.select("body").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-zoom = svg.attr('width', width)
+const zoomG = svg
+    .attr('width', width)
     .attr('height', height)
-    .append('g');
+  .append('g').attr('id', "2");
 
-g = zoom.append('g')
-.attr('transform', `translate(${margin.left},${margin.top})`);  
+const g = zoomG
+    .attr('transform', `translate(${margin.left},${margin.top})`);
 
-console.log({g})
-
-svg.call(d3.zoom().on('zoom', () => {
-    g.attr('transform', d3.event.transform);
-  }));
+zoomG.call(d3.zoom().on('zoom', () => {
+    console.log({zoomG});
+    zoomG.attr('transform', d3.event.transform);
+}));
 
 tree = d3.layout.tree()
-    .size([height, width]);
+    .size([innerHeight, innerWidth]);
 
 diagonal = d3.svg.diagonal()
     .projection(function (d) { return [d.y, d.x]; });
@@ -90,7 +86,7 @@ root.y0 = 0;
 
 update(root);
 
-d3.select(self.frameElement).style("height", "500px");
+
 
 function update(source) {
 
@@ -106,30 +102,15 @@ function update(source) {
     });
 
     // // Update the nodes
-    var node = svg.selectAll("g.node").data(nodes, function (d) { 
+    var node = zoomG.selectAll("g.node").data(nodes, function (d) { 
         return d.id || (d.id = ++i); 
     });
     console.log({node});
 
-    // // Enter any new nodes at the parent's previous position.
-    // let div = document.createElement("div");
     var nodeEnter = node.enter().append("g")
         .attr("class", "node")
         .attr("transform", function (d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-        .on("click", click)
-        // .on("mouseover", function(d) {		
-        //     div.transition()		
-        //         .duration(200)		
-        //         .style("opacity", .9);		
-        //     div	.html("<h5>description:</h5><p> " + description[d.name] +"</p>")	
-        //         .style("left", (d3.event.pageX) + "px")		
-        //         .style("top", (d3.event.pageY - 28) + "px");	
-        //     })					
-        // .on("mouseout", function(d) {		
-        //     div.transition()		
-        //         .duration(500)		
-        //         .style("opacity", 0);	
-        // });
+        .on("click", click);
 
     console.log({nodeEnter});
 
@@ -155,38 +136,9 @@ function update(source) {
     nodeEnter.append("text")        
         .attr("dy", ".35em")
         .text(function (d) { return d.name; })
-        .style("fill-opacity", 1e-6)
-        .on("mouseover", function(d) {  
-            let a = document.getElementById(d.id);
-            console.log(a);
-            a.classList.remove("div-hover-out")
-            a.classList.add("div-hover-in")
-            // console.log(div);       
-            // div.style.width = "100px";
-            // div.style.height = "100px";
-            // div.style.background = "red";
-            // div.style.color = "white";
-            // div.classList.add("div-hover-in")
-            // div.innerHTML = d.categoria;
-            // console.log(div);
-            })                  
-        .on("mouseout", function(d) {
-            let a = document.getElementById(d.id);
-            console.log(a);
-            a.classList.remove("div-hover-in");
-            a.classList.add("div-hover-out");
-        });
+        .style("fill-opacity", 1e-6);
         console.log({nodeEnter});
-        // let test = document.createElement("div");
-        // test.style.width = "100px";
-        // test.style.height = "100px";
-        // test.style.background = "red";
-        // test.style.color = "white";
-        // test.innerHTML = "Hello";
-            
-        // nodeEnter.append(test);
         
-    // // Transition nodes to their new position.
     var nodeUpdate = node.transition()
         .duration(duration)
         .attr("transform", function (d) { return "translate(" + d.y + "," + d.x + ")"; });
@@ -231,7 +183,7 @@ function update(source) {
         .style("fill-opacity", 1e-6);
 
     // // Update the links
-    var link = svg.selectAll("path.link")
+    var link = zoomG.selectAll("path.link")
         .data(links, function (d) { return d.target.id; });
 
     // // Enter any new links at the parent's previous position.
@@ -265,13 +217,13 @@ function update(source) {
 
 // Toggle children on click.
 function click(d) {
-if (d.children) {
-    d._children = d.children;
-    d.children = null;
-} else {
-    d.children = d._children;
-    d._children = null;
-}
-update(d);
+    if (d.children) {
+        d._children = d.children;
+        d.children = null;
+    } else {
+        d.children = d._children;
+        d._children = null;
+    }
+    update(d);
 }
 
